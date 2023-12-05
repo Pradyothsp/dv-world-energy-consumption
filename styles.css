@@ -47,6 +47,14 @@ label {
 
 /* Center the chart container */
 #chart-container {
-  margin-top: 100px; /* Adjust the margin as needed */
+  margin-top: 100px;
+  /* Adjust the margin as needed */
   text-align: center;
+}
+
+/* Add your CSS styling here */
+.dot {
+  fill: orange;
+  stroke: white; /* Set the stroke color of the dot */
+  stroke-width: 2; /* Set the width of the dot's stroke */
 }

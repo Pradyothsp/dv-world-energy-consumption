@@ -23,7 +23,7 @@ d3.json("data/world_clean_dataset.json").then(function (data) {
 
     // Set up the chart dimensions
     const margin = { top: 30, right: 50, bottom: 70, left: 100 };
-    const width = 1500 - margin.left - margin.right;
+    const width = 1200 - margin.left - margin.right;
     const height = 600 - margin.top - margin.bottom;
 
     // Create color scale for bars and line
@@ -124,9 +124,9 @@ d3.json("data/world_clean_dataset.json").then(function (data) {
             .enter().append("rect")
             .attr("class", "bar-gdp")
             .attr("x", d => xScale(d.year))
-            .attr("y", d => yScaleGDP(d.gdp))
+            .attr("y", height) // Start the bars at the bottom of the chart
             .attr("width", xScale.bandwidth())
-            .attr("height", d => height - yScaleGDP(d.gdp))
+            .attr("height", 0) // Set initial height to 0
             .style("fill", d => colorScale(d.primary_energy_consumption))
             .on("mouseover", function (event, d) {
                 const tooltipData = filteredData[d];
@@ -134,18 +134,31 @@ d3.json("data/world_clean_dataset.json").then(function (data) {
                 tooltip.transition()
                     .duration(200)
                     .style("opacity", .9);
-                tooltip.html("GDP: " + (+tooltipData.gdp).toLocaleString() + "<br>Energy Consumption: " + (+tooltipData.primary_energy_consumption).toLocaleString())
-                    .style("left", (event.pageX + 10) + "px")
+                tooltip.html(
+                    "GDP: $ " + (+tooltipData.gdp).toLocaleString() +
+                    "<br>Energy Consumption: " + (+tooltipData.primary_energy_consumption).toLocaleString() + " terawatt-hours" +
+                    "<br>Year: " + tooltipData.year
+                )
+                    .style("left", (event.pageX + 10) + "px") // Adjust position relative to cursor
                     .style("top", (event.pageY - 28) + "px");
             })
-            .on("mouseout", function () {
+            .on("mousemove", function (event, d) {
+                // Update the position of the tooltip with the mouse movement
+                const [x, y] = d3.mouse(this.parentNode);
+                tooltip.style("left", (x + 100) + "px")
+                    .style("top", (y + 250) + "px");
+            })
+            .on("mouseout", function (d) {
                 // Hide tooltip on mouseout
                 tooltip.transition()
                     .duration(500)
                     .style("opacity", 0);
             })
             .transition() // Add a transition for a smoother update
-            .duration(500); // Set the duration of the transition
+            .duration(500) // Set the duration of the transition
+            .attr("y", d => yScaleGDP(d.gdp))
+            .attr("height", d => height - yScaleGDP(d.gdp));
+
         // Draw line for primary_energy_consumption with color grading
         const line = d3.line()
             .x(d => xScale(d.year) + xScale.bandwidth() / 2)
