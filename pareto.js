@@ -10,6 +10,10 @@ d3.json("data/world_clean_dataset.json").then(function (data) {
     // Get unique country names
     const countries = Array.from(new Set(data.map(d => d.country)));
 
+    // After populating the select element with country options
+    console.log("Dropdown Options:", countries);
+
+
     // Populate the select element with country options
     const select = d3.select("#countrySelect")
         .selectAll("option")
@@ -36,49 +40,69 @@ d3.json("data/world_clean_dataset.json").then(function (data) {
         .append("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
+    // Create x and y scales (initial scales for all data)
+    const xScale = d3.scaleBand()
+        .domain(data.map(d => d.year))
+        .range([0, width])
+        .padding(0.1)
+        .paddingOuter(0.2);  // Add padding to the outer edges
+
+    const yScaleGDP = d3.scaleLinear()
+        .domain([0, d3.max(data, d => d.gdp)])
+        .range([height, 0]);
+
+    const yScaleEnergy = d3.scaleLinear()
+        .domain([0, d3.max(data, d => d.primary_energy_consumption)])
+        .range([height, 0]);
+
+    // Create x and y axes
+    const xAxis = d3.axisBottom(xScale);
+    const yAxisGDP = d3.axisLeft(yScaleGDP);
+    const yAxisEnergy = d3.axisRight(yScaleEnergy);
+
+    // Draw x axis
+    svg.append("g")
+        .attr("transform", "translate(0," + height + ")")
+        .call(xAxis)
+        .attr("class", "axis-bottom"); // Add a class for styling
+
+    // Draw y axis for GDP (left)
+    svg.append("g")
+        .call(yAxisGDP)
+        .attr("class", "axis-left"); // Add a class for styling
+
+    // Draw y axis for primary_energy_consumption (right)
+    svg.append("g")
+        .attr("transform", "translate(" + width + ", 0)")
+        .call(yAxisEnergy)
+        .attr("class", "axis-right"); // Add a class for styling
+
+
     // Function to update the chart based on the selected country
     function updateChart(selectedCountry) {
+        console.log("Updating chart for:", selectedCountry);
+
         const filteredData = data.filter(d => d.country === selectedCountry);
 
-        // Create x and y scales
-        const xScale = d3.scaleBand()
-            .domain(filteredData.map(d => d.year))
-            .range([0, width])
-            .padding(0.1)
-            .paddingOuter(0.2);  // Add padding to the outer edges
+        console.log("Filtered Data:", filteredData);
 
-        const yScaleGDP = d3.scaleLinear()
-            .domain([0, d3.max(filteredData, d => d.gdp)])
-            .range([height, 0]);
+        // Update x and y scales for the filtered data
+        xScale.domain(filteredData.map(d => d.year));
+        yScaleGDP.domain([0, d3.max(filteredData, d => d.gdp)]);
+        yScaleEnergy.domain([0, d3.max(filteredData, d => d.primary_energy_consumption)]);
 
-        const yScaleEnergy = d3.scaleLinear()
-            .domain([0, d3.max(filteredData, d => d.primary_energy_consumption)])
-            .range([height, 0]);
+        console.log("X Scale Domain:", xScale.domain());
+        console.log("Y Scale GDP Domain:", yScaleGDP.domain());
+        console.log("Y Scale Energy Domain:", yScaleEnergy.domain());
 
-        // Create x and y axes
-        const xAxis = d3.axisBottom(xScale);
-        const yAxisGDP = d3.axisLeft(yScaleGDP);
-        const yAxisEnergy = d3.axisRight(yScaleEnergy);
+        // Update x and y axes
+        svg.select(".axis-bottom").call(xAxis);
+        svg.select(".axis-left").call(yAxisGDP);
+        svg.select(".axis-right").call(yAxisEnergy);
 
         // Remove existing chart elements
         svg.selectAll(".bar-gdp").remove();
         svg.selectAll(".line-energy").remove();
-
-        // Draw x axis
-        svg.append("g")
-            .attr("transform", "translate(0," + height + ")")
-            .call(xAxis);
-
-        // Draw y axis for GDP (left)
-        svg.append("g")
-            .call(yAxisGDP)
-            .attr("class", "axis-left");
-
-        // Draw y axis for primary_energy_consumption (right)
-        svg.append("g")
-            .attr("transform", "translate(" + width + ", 0)")
-            .call(yAxisEnergy)
-            .attr("class", "axis-right");
 
         // Draw bars for GDP with color grading
         svg.selectAll(".bar-gdp")
@@ -101,14 +125,17 @@ d3.json("data/world_clean_dataset.json").then(function (data) {
             .attr("class", "line-energy")
             .attr("d", line)
             .style("stroke-width", 2)  // Set the stroke width to 2 pixels
-            .style("stroke", "black");  // Set the stroke color to black
+            .style("stroke", "orange");  // Set the stroke color to black
+
+        console.log("Chart updated!");
     }
+
 
     // Initial update with the first country in the list
     updateChart(countries[0]);
 
     // Add event listener to update the chart when the user selects a different country
-    select.on("change", function () {
+    d3.select("#countrySelect").on("change", function () {
         const selectedCountry = d3.select(this).property("value");
         updateChart(selectedCountry);
     });
