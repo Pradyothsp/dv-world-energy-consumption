@@ -13,6 +13,23 @@ d3.json("data/world_clean_dataset.json").then(function (data) {
     // After populating the select element with country options
     console.log("Dropdown Options:", countries);
 
+    // Get unique consumption types
+    const consumptionSelect = [
+        "primary_energy_consumption",
+        "coal_cons_per_capita",
+        "gas_energy_per_capita",
+        "hydro_elec_per_capita",
+        "low_carbon_energy_per_capita",
+        "oil_energy_per_capita",
+        "renewables_energy_per_capita",
+        "renewables_consumption",
+        "fossil_fuel_consumption"
+    ];
+
+    // After populating the consumption type select element
+    console.log("Consumption Type Options:", consumptionSelect);
+
+
     // Populate the select element with country options
     const select = d3.select("#countrySelect")
         .selectAll("option")
@@ -21,8 +38,16 @@ d3.json("data/world_clean_dataset.json").then(function (data) {
         .append("option")
         .text(d => d);
 
+    // Populate the consumption type select element
+    const consumptionSelectElement = d3.select("#consumptionSelect")
+        .selectAll("option")
+        .data(consumptionSelect)
+        .enter()
+        .append("option")
+        .text(d => d);
+
     // Set up the chart dimensions
-    const margin = { top: 30, right: 50, bottom: 70, left: 100 };
+    const margin = { top: 30, right: 70, bottom: 70, left: 150 };
     const width = 1200 - margin.left - margin.right;
     const height = 600 - margin.top - margin.bottom;
 
@@ -82,8 +107,8 @@ d3.json("data/world_clean_dataset.json").then(function (data) {
         .attr("class", "axis-right"); // Add a class for styling
 
     // Function to update the chart based on the selected country
-    function updateChart(selectedCountry) {
-        console.log("Updating chart for:", selectedCountry);
+    function updateChart(selectedCountry, selectedType) {
+        console.log("Updating chart for:", selectedCountry, "with consumption type:", selectedType);
 
         const filteredData = data.filter(d => d.country === selectedCountry);
 
@@ -92,7 +117,8 @@ d3.json("data/world_clean_dataset.json").then(function (data) {
         // Update x and y scales for the filtered data
         xScale.domain(filteredData.map(d => d.year));
         yScaleGDP.domain([0, d3.max(filteredData, d => d.gdp)]);
-        yScaleEnergy.domain([0, d3.max(filteredData, d => d.primary_energy_consumption)]);
+        // yScaleEnergy.domain([0, d3.max(filteredData, d => d.primary_energy_consumption)]);
+        yScaleEnergy.domain([0, d3.max(filteredData, d => +d[selectedType])]);
 
         console.log("X Scale Domain:", xScale.domain());
         console.log("Y Scale GDP Domain:", yScaleGDP.domain());
@@ -162,7 +188,7 @@ d3.json("data/world_clean_dataset.json").then(function (data) {
         // Draw line for primary_energy_consumption with color grading
         const line = d3.line()
             .x(d => xScale(d.year) + xScale.bandwidth() / 2)
-            .y(d => yScaleEnergy(d.primary_energy_consumption));
+            .y(d => yScaleEnergy(+d[selectedType]));
 
         svg.append("path")
             .data([filteredData])
@@ -175,16 +201,58 @@ d3.json("data/world_clean_dataset.json").then(function (data) {
     }
 
     // Initial update with the first country in the list
-    updateChart(countries[0]);
+    updateChart(countries[0], consumptionSelect[0]);
 
-    // Add event listener to update the chart when the user selects a different country
+    // Add event listeners to update the chart when the user selects a different country or consumption type
     d3.select("#countrySelect").on("change", function () {
         const selectedCountry = d3.select(this).property("value");
-        updateChart(selectedCountry);
+        const selectedType = d3.select("#consumptionSelect").property("value");
+        updateChart(selectedCountry, selectedType);
     });
+
+    d3.select("#consumptionSelect").on("change", function () {
+        const selectedType = d3.select(this).property("value");
+        const selectedCountry = d3.select("#countrySelect").property("value");
+        updateChart(selectedCountry, selectedType);
+    });
+
 
     // Create a tooltip div
     const tooltip = d3.select("body").append("div")
         .attr("class", "tooltip")
         .style("opacity", 0);
+
+    // Add a title to the chart
+    svg.append("text")
+        .attr("x", width / 2)
+        .attr("y", -10)
+        .attr("text-anchor", "middle")
+        .style("font-size", "22px")
+        .text("GDP and Primary Energy Consumption");
+
+    // Add x axis label
+    svg.append("text")
+        .attr("x", width / 2)
+        .attr("y", height + 50)
+        .attr("text-anchor", "middle")
+        .style("font-size", "14px")
+        .text("Year");
+
+    // Add y axis label for GDP (left)
+    svg.append("text")
+        .attr("transform", "rotate(-90)")
+        .attr("x", -height / 2)
+        .attr("y", -100)
+        .attr("text-anchor", "middle")
+        .style("font-size", "14px")
+        .text("GDP");
+
+    // Add y axis label for primary_energy_consumption (right)
+    svg.append("text")
+        .attr("transform", "rotate(-90)")
+        .attr("x", -height / 2)
+        .attr("y", width + 50)
+        .attr("text-anchor", "middle")
+        .style("font-size", "14px")
+        .text("Primary Energy Consumption (in terawatt-hours)");
 });
