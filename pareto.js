@@ -22,8 +22,6 @@ d3.json("data/world_clean_dataset.json").then(function (data) {
         "low_carbon_energy_per_capita": "Low Carbon Energy Consumption per Capita",
         "oil_energy_per_capita": "Oil Energy Consumption per Capita",
         "renewables_energy_per_capita": "Renewables Energy Consumption per Capita"
-        // "renewables_consumption": "Renewables Consumption",
-        // "fossil_fuel_consumption": "Fossil Fuel Consumption"
     };
 
     // Reverse mapping for line chart processing
@@ -153,6 +151,7 @@ d3.json("data/world_clean_dataset.json").then(function (data) {
         // Remove existing chart elements
         svg.selectAll(".bar-gdp").remove();
         svg.selectAll(".line-energy").remove();
+        svg.selectAll(".dot").remove();
 
         // Draw bars for GDP with color grading and tooltip
         const bars = svg.selectAll(".bar-gdp")
@@ -206,6 +205,43 @@ d3.json("data/world_clean_dataset.json").then(function (data) {
             .attr("d", line)
             .style("stroke-width", 2)  // Set the stroke width to 2 pixels
             .style("stroke", "orange");  // Set the stroke color to black
+
+        // Draw dots on the line chart
+        svg.selectAll(".dot")
+            .data(filteredData)
+            .enter().append("circle")
+            .attr("class", "dot")
+            .attr("cx", d => xScale(d.year) + xScale.bandwidth() / 2)
+            .attr("cy", d => yScaleEnergy(+d[selectedType]))
+            .attr("r", 5)
+            .style("fill", "red")
+            .on("mouseover", function (event, d) {
+                const tooltipData = filteredData[d];
+                // Show tooltip on mouseover
+                tooltip.transition()
+                    .duration(200)
+                    .style("opacity", .9);
+                tooltip.html(
+                    "GDP: $ " + (+tooltipData.gdp).toLocaleString() +
+                    "<br>Energy Consumption: " + (+tooltipData.primary_energy_consumption).toLocaleString() + " terawatt-hours" +
+                    "<br>Year: " + tooltipData.year
+                )
+                    .style("left", (event.pageX + 10) + "px") // Adjust position relative to cursor
+                    .style("top", (event.pageY - 28) + "px");
+            })
+            .on("mousemove", function (event, d) {
+                // Update the position of the tooltip with the mouse movement
+                const [x, y] = d3.mouse(this.parentNode);
+                tooltip.style("left", (x + 100) + "px")
+                    .style("top", (y + 250) + "px");
+            })
+            .on("mouseout", function (d) {
+                // Hide tooltip on mouseout
+                tooltip.transition()
+                    .duration(500)
+                    .style("opacity", 0);
+            })
+
 
         console.log("Chart updated!");
     }
