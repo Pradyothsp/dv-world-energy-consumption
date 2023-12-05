@@ -22,8 +22,8 @@ d3.json("data/world_clean_dataset.json").then(function (data) {
         .text(d => d);
 
     // Set up the chart dimensions
-    const margin = { top: 30, right: 50, bottom: 70, left: 70 };
-    const width = 1200 - margin.left - margin.right;
+    const margin = { top: 30, right: 50, bottom: 70, left: 100 };
+    const width = 1500 - margin.left - margin.right;
     const height = 600 - margin.top - margin.bottom;
 
     // Create color scale for bars and line
@@ -65,10 +65,15 @@ d3.json("data/world_clean_dataset.json").then(function (data) {
         .call(xAxis)
         .attr("class", "axis-bottom"); // Add a class for styling
 
-    // Draw y axis for GDP (left)
+    /// Draw y axis for GDP (left)
     svg.append("g")
         .call(yAxisGDP)
-        .attr("class", "axis-left"); // Add a class for styling
+        .attr("class", "axis-left")
+        .selectAll(".tick text")
+        .style("text-anchor", "end")
+        .attr("dy", -1) // Adjust the vertical position of tick labels
+        .attr("dx", -4); // Adjust the horizontal position of tick labels
+
 
     // Draw y axis for primary_energy_consumption (right)
     svg.append("g")
@@ -132,7 +137,7 @@ d3.json("data/world_clean_dataset.json").then(function (data) {
                     .style("left", (event.pageX + 10) + "px") // Adjust position relative to cursor
                     .style("top", (event.pageY - 28) + "px");
             })
-            .on("mouseout", function (d) {
+            .on("mouseout", function () {
                 // Hide tooltip on mouseout
                 tooltip.transition()
                     .duration(500)
@@ -141,7 +146,7 @@ d3.json("data/world_clean_dataset.json").then(function (data) {
             .transition() // Add a transition for a smoother update
             .duration(500) // Set the duration of the transition
             .attr("y", d => yScaleGDP(d.gdp))
-            .attr("height", d => height - yScaleGDP(d.gdp));
+            .attr("height", d => height - yScaleGDP(d.gdp));;
 
         // Draw line for primary_energy_consumption with color grading
         const line = d3.line()

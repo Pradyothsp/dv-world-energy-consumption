@@ -9,3 +9,44 @@
   stroke: orange;
   stroke-width: 2;
 }
+
+/* Add your existing styles here */
+
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  background-color: #f4f4f4;
+}
+
+label {
+  margin-bottom: 10px;
+}
+
+#countrySelect {
+  padding: 5px;
+  margin-bottom: 20px;
+}
+
+.tooltip {
+  position: absolute;
+  background-color: white;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 10px;
+  opacity: 0;
+  pointer-events: none;
+  font-size: 12px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Center the chart container */
+#chart-container {
+  margin-top: 100px; /* Adjust the margin as needed */
+  text-align: center;
+}
