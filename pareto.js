@@ -13,18 +13,28 @@ d3.json("data/world_clean_dataset.json").then(function (data) {
     // After populating the select element with country options
     console.log("Dropdown Options:", countries);
 
-    // Get unique consumption types
-    const consumptionSelect = [
-        "primary_energy_consumption",
-        "coal_cons_per_capita",
-        "gas_energy_per_capita",
-        "hydro_elec_per_capita",
-        "low_carbon_energy_per_capita",
-        "oil_energy_per_capita",
-        "renewables_energy_per_capita",
-        "renewables_consumption",
-        "fossil_fuel_consumption"
-    ];
+    // Define a mapping for consumption types
+    const consumptionTypeMapping = {
+        "primary_energy_consumption": "Primary Energy Consumption",
+        "coal_cons_per_capita": "Coal Consumption per Capita",
+        "gas_energy_per_capita": "Gas Energy Consumption per Capita",
+        "hydro_elec_per_capita": "Hydroelectric Energy Consumption per Capita",
+        "low_carbon_energy_per_capita": "Low Carbon Energy Consumption per Capita",
+        "oil_energy_per_capita": "Oil Energy Consumption per Capita",
+        "renewables_energy_per_capita": "Renewables Energy Consumption per Capita",
+        "renewables_consumption": "Renewables Consumption",
+        "fossil_fuel_consumption": "Fossil Fuel Consumption"
+    };
+
+    // Reverse mapping for line chart processing
+    const consumptionTypeInternalMapping = Object.fromEntries(
+        Object.entries(consumptionTypeMapping).map(([key, value]) => [value, key])
+    );
+
+    // Use the mapped names for dropdown options
+    const consumptionSelect = Object.values(consumptionTypeMapping);
+
+
 
     // After populating the consumption type select element
     console.log("Consumption Type Options:", consumptionSelect);
@@ -201,19 +211,21 @@ d3.json("data/world_clean_dataset.json").then(function (data) {
     }
 
     // Initial update with the first country in the list
-    updateChart(countries[0], consumptionSelect[0]);
+    updateChart(countries[0], consumptionTypeInternalMapping[consumptionSelect[0]]);
 
-    // Add event listeners to update the chart when the user selects a different country or consumption type
+    // Add event listener to update the chart when the user selects a different country
     d3.select("#countrySelect").on("change", function () {
         const selectedCountry = d3.select(this).property("value");
-        const selectedType = d3.select("#consumptionSelect").property("value");
-        updateChart(selectedCountry, selectedType);
+        const selectedTypeDisplay = d3.select("#consumptionSelect").property("value");
+        const selectedTypeInternal = consumptionTypeInternalMapping[selectedTypeDisplay];
+        updateChart(selectedCountry, selectedTypeInternal, selectedTypeDisplay);
     });
 
     d3.select("#consumptionSelect").on("change", function () {
-        const selectedType = d3.select(this).property("value");
+        const selectedTypeDisplay = d3.select(this).property("value");
+        const selectedTypeInternal = consumptionTypeInternalMapping[selectedTypeDisplay];
         const selectedCountry = d3.select("#countrySelect").property("value");
-        updateChart(selectedCountry, selectedType);
+        updateChart(selectedCountry, selectedTypeInternal);
     });
 
 

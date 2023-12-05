@@ -33,6 +33,11 @@ label {
   margin-bottom: 20px;
 }
 
+#EnergySelect {
+  padding: 5px;
+  margin-bottom: 20px;
+}
+
 .tooltip {
   position: absolute;
   background-color: white;
