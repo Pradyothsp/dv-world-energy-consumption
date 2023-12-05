@@ -13,7 +13,6 @@ d3.json("data/world_clean_dataset.json").then(function (data) {
     // After populating the select element with country options
     console.log("Dropdown Options:", countries);
 
-
     // Populate the select element with country options
     const select = d3.select("#countrySelect")
         .selectAll("option")
@@ -77,7 +76,6 @@ d3.json("data/world_clean_dataset.json").then(function (data) {
         .call(yAxisEnergy)
         .attr("class", "axis-right"); // Add a class for styling
 
-
     // Function to update the chart based on the selected country
     function updateChart(selectedCountry) {
         console.log("Updating chart for:", selectedCountry);
@@ -95,25 +93,55 @@ d3.json("data/world_clean_dataset.json").then(function (data) {
         console.log("Y Scale GDP Domain:", yScaleGDP.domain());
         console.log("Y Scale Energy Domain:", yScaleEnergy.domain());
 
-        // Update x and y axes
-        svg.select(".axis-bottom").call(xAxis);
-        svg.select(".axis-left").call(yAxisGDP);
-        svg.select(".axis-right").call(yAxisEnergy);
+        // Update x and y axes with transitions
+        svg.select(".axis-bottom")
+            .transition()
+            .duration(500)
+            .call(xAxis);
+
+        svg.select(".axis-left")
+            .transition()
+            .duration(500)
+            .call(yAxisGDP);
+
+        svg.select(".axis-right")
+            .transition()
+            .duration(500)
+            .call(yAxisEnergy);
 
         // Remove existing chart elements
         svg.selectAll(".bar-gdp").remove();
         svg.selectAll(".line-energy").remove();
 
-        // Draw bars for GDP with color grading
-        svg.selectAll(".bar-gdp")
+        // Draw bars for GDP with color grading and tooltip
+        const bars = svg.selectAll(".bar-gdp")
             .data(filteredData)
             .enter().append("rect")
             .attr("class", "bar-gdp")
             .attr("x", d => xScale(d.year))
-            .attr("y", d => yScaleGDP(d.gdp))
+            .attr("y", height) // Start the bars at the bottom of the chart
             .attr("width", xScale.bandwidth())
-            .attr("height", d => height - yScaleGDP(d.gdp))
-            .style("fill", d => colorScale(d.primary_energy_consumption));
+            .attr("height", 0) // Set initial height to 0
+            .style("fill", d => colorScale(d.primary_energy_consumption))
+            .on("mouseover", function (event, d) {
+                // Show tooltip on mouseover
+                tooltip.transition()
+                    .duration(200)
+                    .style("opacity", .9);
+                tooltip.html("GDP: " + d.gdp + "<br>Energy Consumption: " + d.primary_energy_consumption)
+                    .style("left", (event.pageX + 10) + "px") // Adjust position relative to cursor
+                    .style("top", (event.pageY - 28) + "px");
+            })
+            .on("mouseout", function (d) {
+                // Hide tooltip on mouseout
+                tooltip.transition()
+                    .duration(500)
+                    .style("opacity", 0);
+            })
+            .transition() // Add a transition for a smoother update
+            .duration(500) // Set the duration of the transition
+            .attr("y", d => yScaleGDP(d.gdp))
+            .attr("height", d => height - yScaleGDP(d.gdp));
 
         // Draw line for primary_energy_consumption with color grading
         const line = d3.line()
@@ -130,7 +158,6 @@ d3.json("data/world_clean_dataset.json").then(function (data) {
         console.log("Chart updated!");
     }
 
-
     // Initial update with the first country in the list
     updateChart(countries[0]);
 
@@ -139,4 +166,9 @@ d3.json("data/world_clean_dataset.json").then(function (data) {
         const selectedCountry = d3.select(this).property("value");
         updateChart(selectedCountry);
     });
+
+    // Create a tooltip div
+    const tooltip = d3.select("body").append("div")
+        .attr("class", "tooltip")
+        .style("opacity", 0);
 });
