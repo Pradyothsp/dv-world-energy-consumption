@@ -21,9 +21,9 @@ d3.json("data/world_clean_dataset.json").then(function (data) {
         "hydro_elec_per_capita": "Hydroelectric Energy Consumption per Capita",
         "low_carbon_energy_per_capita": "Low Carbon Energy Consumption per Capita",
         "oil_energy_per_capita": "Oil Energy Consumption per Capita",
-        "renewables_energy_per_capita": "Renewables Energy Consumption per Capita",
-        "renewables_consumption": "Renewables Consumption",
-        "fossil_fuel_consumption": "Fossil Fuel Consumption"
+        "renewables_energy_per_capita": "Renewables Energy Consumption per Capita"
+        // "renewables_consumption": "Renewables Consumption",
+        // "fossil_fuel_consumption": "Fossil Fuel Consumption"
     };
 
     // Reverse mapping for line chart processing
