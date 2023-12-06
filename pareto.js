@@ -326,46 +326,46 @@ d3.json("data/world_clean_dataset.json").then(function (data) {
         .style("opacity", 0);
 
     // Add a title to the chart
-svg.append("text")
-.attr("x", width / 2)
-.attr("y", -10)
-.attr("text-anchor", "middle")
-.style("font-size", "22px")
-.style("fill", "#fff") // Set text color to white
-.style("font-weight", "bold") // Set font weight to bold
-.text("GDP and Primary Energy Consumption");
+    svg.append("text")
+        .attr("x", width / 2)
+        .attr("y", -10)
+        .attr("text-anchor", "middle")
+        .style("font-size", "22px")
+        .style("fill", "#fff") // Set text color to white
+        .style("font-weight", "bold") // Set font weight to bold
+        .text("GDP vs Energy Consumption");
 
-// Add x-axis label
-svg.append("text")
-.attr("x", width / 2)
-.attr("y", height + 50)
-.attr("text-anchor", "middle")
-.style("font-size", "14px")
-.style("fill", "#fff") // Set text color to white
-.style("font-weight", "bold") // Set font weight to bold
-.text("Year");
+    // Add x-axis label
+    svg.append("text")
+        .attr("x", width / 2)
+        .attr("y", height + 50)
+        .attr("text-anchor", "middle")
+        .style("font-size", "14px")
+        .style("fill", "#fff") // Set text color to white
+        .style("font-weight", "bold") // Set font weight to bold
+        .text("Year");
 
-// Add y-axis label for GDP (left)
-svg.append("text")
-.attr("transform", "rotate(-90)")
-.attr("x", -height / 2)
-.attr("y", -100)
-.attr("text-anchor", "middle")
-.style("font-size", "14px")
-.style("fill", "#fff") // Set text color to white
-.style("font-weight", "bold") // Set font weight to bold
-.text("GDP");
+    // Add y-axis label for GDP (left)
+    svg.append("text")
+        .attr("transform", "rotate(-90)")
+        .attr("x", -height / 2)
+        .attr("y", -100)
+        .attr("text-anchor", "middle")
+        .style("font-size", "14px")
+        .style("fill", "#fff") // Set text color to white
+        .style("font-weight", "bold") // Set font weight to bold
+        .text("GDP");
 
-// Add y-axis label for energy consumption (right)
-const yAxisEnergyLabel = svg.append("text")
-.attr("transform", "rotate(-90)")
-.attr("x", -height / 2)
-.attr("y", width + 60)
-.attr("text-anchor", "middle")
-.style("font-size", "14px")
-.style("fill", "#fff") // Set text color to white
-.style("font-weight", "bold") // Set font weight to bold
-.text("Energy Consumption (in TWh)");
+    // Add y-axis label for energy consumption (right)
+    const yAxisEnergyLabel = svg.append("text")
+        .attr("transform", "rotate(-90)")
+        .attr("x", -height / 2)
+        .attr("y", width + 60)
+        .attr("text-anchor", "middle")
+        .style("font-size", "14px")
+        .style("fill", "#fff") // Set text color to white
+        .style("font-weight", "bold") // Set font weight to bold
+        .text("Energy Consumption (in TWh)");
 
     // Function to update y-axis label
     function updateYAxisLabel(selectedType) {
