@@ -33,7 +33,6 @@ d3.json("data/world_clean_dataset.json").then(function (data) {
     const consumptionSelect = Object.values(consumptionTypeMapping);
 
 
-
     // After populating the consumption type select element
     console.log("Consumption Type Options:", consumptionSelect);
 
@@ -55,7 +54,7 @@ d3.json("data/world_clean_dataset.json").then(function (data) {
         .text(d => d);
 
     // Set up the chart dimensions
-    const margin = { top: 30, right: 70, bottom: 70, left: 150 };
+    const margin = { top: 30, right: 100, bottom: 70, left: 150 };
     const width = 1200 - margin.left - margin.right;
     const height = 600 - margin.top - margin.bottom;
 
@@ -175,11 +174,11 @@ d3.json("data/world_clean_dataset.json").then(function (data) {
                 const formattedGDP = (+tooltipData.gdp / 1e12).toLocaleString() + " T";
 
                 // change unit dynamically based on the selected consumption type
-                let unit = " kilowatt-hours";
+                let unit = " kWh";
 
                 // Check if the selectedType is 'primary_energy_consumption'
                 if (selectedType === 'primary_energy_consumption') {
-                    unit = " terawatt-hours";
+                    unit = " TWh";
                 }
 
                 // Increase size on mouseover
@@ -259,11 +258,11 @@ d3.json("data/world_clean_dataset.json").then(function (data) {
                 const formattedGDP = (+tooltipData.gdp / 1e12).toLocaleString() + " T";
 
                 // change unit dynamically based on the selected consumption type
-                let unit = " kilowatt-hours";
+                let unit = " kWh";
 
                 // Check if the selectedType is 'primary_energy_consumption'
                 if (selectedType === 'primary_energy_consumption') {
-                    unit = " terawatt-hours";
+                    unit = " TWh";
                 }
 
                 // Change color on mouseover
@@ -357,18 +356,18 @@ d3.json("data/world_clean_dataset.json").then(function (data) {
     const yAxisEnergyLabel = svg.append("text")
         .attr("transform", "rotate(-90)")
         .attr("x", -height / 2)
-        .attr("y", width + 50)
+        .attr("y", width + 60)
         .attr("text-anchor", "middle")
         .style("font-size", "14px")
-        .text("Energy Consumption (in terawatt-hours)");
+        .text("Energy Consumption (in TWh)");
 
     // Function to update y-axis label
     function updateYAxisLabel(selectedType) {
-        let unit = "kilowatt-hours";
+        let unit = "kWh";
 
         // Check if the selectedType is 'primary_energy_consumption'
         if (selectedType === 'Primary Energy Consumption') {
-            unit = "terawatt-hours";
+            unit = "TWh";
         }
 
         yAxisEnergyLabel.text(`${selectedType} (in ${unit})`);

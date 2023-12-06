@@ -57,6 +57,13 @@ label {
   text-align: center;
 }
 
+/* Center the chart container */
+#bc-chart-container {
+  margin-top: 100px;
+  /* Adjust the margin as needed */
+  text-align: center;
+}
+
 /* Add your CSS styling here */
 .dot {
   fill: orange;
