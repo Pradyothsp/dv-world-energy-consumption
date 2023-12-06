@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Donut Chart with Legends</title>
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+</head>
+<body>
+
+<div id="donutChart"></div>
+
+<script>
+  // Sample data
+  const energyData = {
+    coal_cons_per_capita: "316.387",
+    fossil_fuel_consumption: "854.012",
+    gas_energy_per_capita: "10037.938",
+    hydro_elec_per_capita: "574.595",
+    low_carbon_energy_per_capita: "3229.188",
+    oil_energy_per_capita: "8410.91",
+    renewables_energy_per_capita: "2818.588"
+  };
+
+  // Extract values from energyData
+  const data = Object.values(energyData).map(Number);
+
+  // Dimensions and radius
+  const width = 200;
+  const height = 300; // Increased height
+  const radius = Math.min(width, height) / 2;
+
+  // Color scale
+  const color = d3.scaleOrdinal().range(["#FF5733", "#FFD700", "#87CEEB", "#90EE90", "#8B4513", "#FFA500"]);
+
+  // Create SVG element
+  const svg = d3.select("#donutChart")
+    .append("svg")
+    .attr("width", width * 2) // Increased width for separation
+    .attr("height", height) // Updated height
+    .append("g")
+    .attr("transform", `translate(${width / 2}, ${height / 2})`);
+
+  // Create arc generator
+  const arc = d3.arc()
+    .innerRadius(radius - 40)
+    .outerRadius(radius);
+
+  // Create pie chart layout
+  const pie = d3.pie();
+
+  // Generate arcs and append to SVG
+  const arcs = svg.selectAll("path")
+    .data(pie(data))
+    .enter()
+    .append("path")
+    .attr("d", arc)
+    .attr("fill", (d, i) => color(i));
+
+  // Legend
+  const legend = svg.selectAll(".legend")
+    .data(color.domain())
+    .enter()
+    .append("g")
+    .attr("class", "legend")
+    .attr("transform", (d, i) => `translate(${width - 70}, ${i * 20 - height / 2 + 40})`); // Adjusted separation and offset
+
+  // Legend rectangles
+  legend.append("rect")
+    .attr("width", 18)
+    .attr("height", 18)
+    .style("fill", color);
+
+  // Legend text
+  legend.append("text")
+    .attr("x", 24)
+    .attr("y", 9)
+    .attr("dy", ".35em")
+    .style("text-anchor", "start")
+    .text((d, i) => {
+      // Customize the legend text based on your data
+      const legendText = [
+        "Coal", "Fossil Fuel", "Gas", "Hydro", "Low Carbon", "Oil", "Renewables"
+      ];
+      return legendText[i];
+    });
+</script>
+
+</body>
+</html>

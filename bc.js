@@ -1,7 +1,7 @@
 // Set up the SVG canvas dimensions
 const width = 900;
 const height = 750;
-const margin = { top: 20, right: 50, bottom: 60, left: 70 };
+const margin = { top: 20, right: 200, bottom: 80, left: 70 };
 
 // Append the SVG to the body
 const svg = d3.select('body')
@@ -70,20 +70,6 @@ d3.csv('data/world_clean_dataset.csv').then(data => {
             .duration(500)
             .call(yAxis);
 
-        // // Add x-axis label
-        // svg.select('.x-axis-label')
-        //     .attr('x', width / 2)
-        //     .attr('y', height - 10)
-        //     .text('Fossil Fuel Consumption');
-
-        // // Add y-axis label
-        // svg.select('.y-axis-label')
-        //     .attr('transform', 'rotate(-90)')
-        //     .attr('x', -height / 2)
-        //     .attr('y', 10)
-        //     .attr('dy', '1em')
-        //     .text('Renewables Consumption');
-
         const bubbles = svg.selectAll('circle')
             .data(top5Countries);
 
@@ -129,6 +115,27 @@ d3.csv('data/world_clean_dataset.csv').then(data => {
                     .duration(500)
                     .style('opacity', 0);
             });
+        // Add legends
+        const legend = svg.selectAll('.legend')
+            .data(top5Countries)
+            .enter()
+            .append('g')
+            .attr('class', 'legend')
+            .attr('transform', (d, i) => `translate(${width - margin.right + 20},${margin.top + i * 20})`);
+
+        legend.append('rect')
+            .attr('x', 0)
+            .attr('width', 18)
+            .attr('height', 18)
+            .attr('fill', d => colorScale(d.country));
+
+        legend.append('text')
+            .attr('x', 24)
+            .attr('y', 9)
+            .attr('dy', '.35em')
+            .style('text-anchor', 'start')
+            .style('fill', 'white')  // Set text color to white using style
+            .text(d => d.country);
     }
 
     // Initial visualization
@@ -164,6 +171,7 @@ d3.csv('data/world_clean_dataset.csv').then(data => {
         .attr('y', height - 10)
         .attr('text-anchor', 'middle')
         .attr('font-weight', 'bold')
+        .style('fill', 'white') // Set text color to white using style
         .text('Fossil Fuel Consumption (kWh)');
 
     // Add y-axis label
@@ -175,6 +183,6 @@ d3.csv('data/world_clean_dataset.csv').then(data => {
         .attr('dy', '1em')
         .attr('text-anchor', 'middle')
         .attr('font-weight', 'bold')
+        .style('fill', 'white') // Set text color to white using style
         .text('Renewables Consumption (kWh)');
-
 });

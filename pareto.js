@@ -197,7 +197,6 @@ d3.json("data/world_clean_dataset.json").then(function (data) {
                     .style("opacity", .9);
                 tooltip.html(
                     "GDP: $ " + formattedGDP +
-                    "<br>Energy Consumption: " + (+tooltipData[selectedType]).toLocaleString() + unit +
                     "<br>Year: " + tooltipData.year
                 )
                     .style("left", (event.pageX + 10) + "px") // Adjust position relative to cursor
@@ -279,8 +278,7 @@ d3.json("data/world_clean_dataset.json").then(function (data) {
                     .duration(200)
                     .style("opacity", .9);
                 tooltip.html(
-                    "GDP: $ " + formattedGDP +
-                    "<br>Energy Consumption: " + (+tooltipData[selectedType]).toLocaleString() + unit +
+                    "Energy Consumption: " + (+tooltipData[selectedType]).toLocaleString() + unit +
                     "<br>Year: " + tooltipData.year
                 )
                     .style("left", (event.pageX + 10) + "px") // Adjust position relative to cursor
@@ -311,15 +309,15 @@ d3.json("data/world_clean_dataset.json").then(function (data) {
         console.log("Chart updated!");
     }
 
-    // Initial update with the first country in the list
+    // Initial update with the first country and consumption type in the list
     updateChart(countries[0], consumptionTypeInternalMapping[consumptionSelect[0]]);
 
-    // Add event listener to update the chart when the user selects a different country
+    // Add event listeners to update the chart when the user selects a different country or consumption type
     d3.select("#countrySelect").on("change", function () {
         const selectedCountry = d3.select(this).property("value");
         const selectedTypeDisplay = d3.select("#consumptionSelect").property("value");
         const selectedTypeInternal = consumptionTypeInternalMapping[selectedTypeDisplay];
-        updateChart(selectedCountry, selectedTypeInternal, selectedTypeDisplay);
+        updateChart(selectedCountry, selectedTypeInternal);
     });
 
     // Create a tooltip div
@@ -328,38 +326,46 @@ d3.json("data/world_clean_dataset.json").then(function (data) {
         .style("opacity", 0);
 
     // Add a title to the chart
-    svg.append("text")
-        .attr("x", width / 2)
-        .attr("y", -10)
-        .attr("text-anchor", "middle")
-        .style("font-size", "22px")
-        .text("GDP and Primary Energy Consumption");
+svg.append("text")
+.attr("x", width / 2)
+.attr("y", -10)
+.attr("text-anchor", "middle")
+.style("font-size", "22px")
+.style("fill", "#fff") // Set text color to white
+.style("font-weight", "bold") // Set font weight to bold
+.text("GDP and Primary Energy Consumption");
 
-    // Add x axis label
-    svg.append("text")
-        .attr("x", width / 2)
-        .attr("y", height + 50)
-        .attr("text-anchor", "middle")
-        .style("font-size", "14px")
-        .text("Year");
+// Add x-axis label
+svg.append("text")
+.attr("x", width / 2)
+.attr("y", height + 50)
+.attr("text-anchor", "middle")
+.style("font-size", "14px")
+.style("fill", "#fff") // Set text color to white
+.style("font-weight", "bold") // Set font weight to bold
+.text("Year");
 
-    // Add y axis label for GDP (left)
-    svg.append("text")
-        .attr("transform", "rotate(-90)")
-        .attr("x", -height / 2)
-        .attr("y", -100)
-        .attr("text-anchor", "middle")
-        .style("font-size", "14px")
-        .text("GDP");
+// Add y-axis label for GDP (left)
+svg.append("text")
+.attr("transform", "rotate(-90)")
+.attr("x", -height / 2)
+.attr("y", -100)
+.attr("text-anchor", "middle")
+.style("font-size", "14px")
+.style("fill", "#fff") // Set text color to white
+.style("font-weight", "bold") // Set font weight to bold
+.text("GDP");
 
-    // Add y axis label for energy consumption (right)
-    const yAxisEnergyLabel = svg.append("text")
-        .attr("transform", "rotate(-90)")
-        .attr("x", -height / 2)
-        .attr("y", width + 60)
-        .attr("text-anchor", "middle")
-        .style("font-size", "14px")
-        .text("Energy Consumption (in TWh)");
+// Add y-axis label for energy consumption (right)
+const yAxisEnergyLabel = svg.append("text")
+.attr("transform", "rotate(-90)")
+.attr("x", -height / 2)
+.attr("y", width + 60)
+.attr("text-anchor", "middle")
+.style("font-size", "14px")
+.style("fill", "#fff") // Set text color to white
+.style("font-weight", "bold") // Set font weight to bold
+.text("Energy Consumption (in TWh)");
 
     // Function to update y-axis label
     function updateYAxisLabel(selectedType) {
