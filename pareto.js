@@ -172,7 +172,15 @@ d3.json("data/world_clean_dataset.json").then(function (data) {
                 const tooltipData = filteredData[d];
 
                 // Format GDP with units (e.g., in trillions)
-                const formattedGDP = (+tooltipData.gdp / 1e12).toLocaleString() + "T";
+                const formattedGDP = (+tooltipData.gdp / 1e12).toLocaleString() + " T";
+
+                // change unit dynamically based on the selected consumption type
+                let unit = " kilowatt-hours";
+
+                // Check if the selectedType is 'primary_energy_consumption'
+                if (selectedType === 'primary_energy_consumption') {
+                    unit = " terawatt-hours";
+                }
 
                 // Increase size on mouseover
                 d3.select(this)
@@ -190,7 +198,7 @@ d3.json("data/world_clean_dataset.json").then(function (data) {
                     .style("opacity", .9);
                 tooltip.html(
                     "GDP: $ " + formattedGDP +
-                    "<br>Energy Consumption: " + (+tooltipData[selectedType]).toLocaleString() + " terawatt-hours" +
+                    "<br>Energy Consumption: " + (+tooltipData[selectedType]).toLocaleString() + unit +
                     "<br>Year: " + tooltipData.year
                 )
                     .style("left", (event.pageX + 10) + "px") // Adjust position relative to cursor
@@ -248,8 +256,15 @@ d3.json("data/world_clean_dataset.json").then(function (data) {
                 const tooltipData = filteredData[d];
 
                 // Format GDP with units (e.g., in trillions)
-                const formattedGDP = (+tooltipData.gdp / 1e12).toLocaleString() + "T";
+                const formattedGDP = (+tooltipData.gdp / 1e12).toLocaleString() + " T";
 
+                // change unit dynamically based on the selected consumption type
+                let unit = " kilowatt-hours";
+
+                // Check if the selectedType is 'primary_energy_consumption'
+                if (selectedType === 'primary_energy_consumption') {
+                    unit = " terawatt-hours";
+                }
 
                 // Change color on mouseover
                 d3.select(this).style("fill", "blue");
@@ -266,7 +281,7 @@ d3.json("data/world_clean_dataset.json").then(function (data) {
                     .style("opacity", .9);
                 tooltip.html(
                     "GDP: $ " + formattedGDP +
-                    "<br>Energy Consumption: " + (+tooltipData[selectedType]).toLocaleString() + " terawatt-hours" +
+                    "<br>Energy Consumption: " + (+tooltipData[selectedType]).toLocaleString() + unit +
                     "<br>Year: " + tooltipData.year
                 )
                     .style("left", (event.pageX + 10) + "px") // Adjust position relative to cursor
@@ -308,14 +323,6 @@ d3.json("data/world_clean_dataset.json").then(function (data) {
         updateChart(selectedCountry, selectedTypeInternal, selectedTypeDisplay);
     });
 
-    d3.select("#consumptionSelect").on("change", function () {
-        const selectedTypeDisplay = d3.select(this).property("value");
-        const selectedTypeInternal = consumptionTypeInternalMapping[selectedTypeDisplay];
-        const selectedCountry = d3.select("#countrySelect").property("value");
-        updateChart(selectedCountry, selectedTypeInternal);
-    });
-
-
     // Create a tooltip div
     const tooltip = d3.select("body").append("div")
         .attr("class", "tooltip")
@@ -347,11 +354,35 @@ d3.json("data/world_clean_dataset.json").then(function (data) {
         .text("GDP");
 
     // Add y axis label for energy consumption (right)
-    svg.append("text")
+    const yAxisEnergyLabel = svg.append("text")
         .attr("transform", "rotate(-90)")
         .attr("x", -height / 2)
         .attr("y", width + 50)
         .attr("text-anchor", "middle")
         .style("font-size", "14px")
         .text("Energy Consumption (in terawatt-hours)");
+
+    // Function to update y-axis label
+    function updateYAxisLabel(selectedType) {
+        let unit = "kilowatt-hours";
+
+        // Check if the selectedType is 'primary_energy_consumption'
+        if (selectedType === 'Primary Energy Consumption') {
+            unit = "terawatt-hours";
+        }
+
+        yAxisEnergyLabel.text(`${selectedType} (in ${unit})`);
+    }
+
+
+    // Initial update with the first consumption type in the list
+    updateYAxisLabel(consumptionSelect[0]);
+
+    d3.select("#consumptionSelect").on("change", function () {
+        const selectedTypeDisplay = d3.select(this).property("value");
+        const selectedTypeInternal = consumptionTypeInternalMapping[selectedTypeDisplay];
+        const selectedCountry = d3.select("#countrySelect").property("value");
+        updateChart(selectedCountry, selectedTypeInternal);
+        updateYAxisLabel(selectedTypeDisplay)
+    });
 });
