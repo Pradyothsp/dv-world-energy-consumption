@@ -165,6 +165,17 @@ d3.json("data/world_clean_dataset.json").then(function (data) {
             .style("fill", d => colorScale(d.primary_energy_consumption))
             .on("mouseover", function (event, d) {
                 const tooltipData = filteredData[d];
+
+                // Increase size on mouseover
+                d3.select(this)
+                    .transition()
+                    .duration(200)
+                    .attr("height", d => height - yScaleGDP(d.gdp) + 10) // Increase height by 5 pixels
+                    .attr("y", d => yScaleGDP(d.gdp) - 5); // Move the bar up by 5 pixels
+
+                // Change color on mouseover
+                d3.select(this).style("fill", "lightcoral");
+
                 // Show tooltip on mouseover
                 tooltip.transition()
                     .duration(200)
@@ -184,6 +195,16 @@ d3.json("data/world_clean_dataset.json").then(function (data) {
                     .style("top", (y + 250) + "px");
             })
             .on("mouseout", function (d) {
+                // Revert size on mouseout
+                d3.select(this)
+                    .transition()
+                    .duration(200)
+                    .attr("height", d => height - yScaleGDP(d.gdp))
+                    .attr("y", d => yScaleGDP(d.gdp));
+
+                // Change color back on mouseout
+                d3.select(this).style("fill", d => colorScale(d.primary_energy_consumption));
+
                 // Hide tooltip on mouseout
                 tooltip.transition()
                     .duration(500)
@@ -217,6 +238,16 @@ d3.json("data/world_clean_dataset.json").then(function (data) {
             .style("fill", "red")
             .on("mouseover", function (event, d) {
                 const tooltipData = filteredData[d];
+
+                // Change color on mouseover
+                d3.select(this).style("fill", "blue");
+
+                // Increase size on mouseover
+                d3.select(this)
+                    .transition()
+                    .duration(200)
+                    .attr("r", 7); // Increase radius by 2 pixels
+
                 // Show tooltip on mouseover
                 tooltip.transition()
                     .duration(200)
@@ -236,6 +267,14 @@ d3.json("data/world_clean_dataset.json").then(function (data) {
                     .style("top", (y + 250) + "px");
             })
             .on("mouseout", function (d) {
+                // Revert color and size on mouseout
+                d3.select(this).style("fill", "red");
+
+                d3.select(this)
+                    .transition()
+                    .duration(200)
+                    .attr("r", 5); // Revert radius to the original value
+
                 // Hide tooltip on mouseout
                 tooltip.transition()
                     .duration(500)
