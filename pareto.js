@@ -4,7 +4,7 @@ d3.json("data/world_clean_dataset.json").then(function (data) {
     data.forEach(function (d) {
         d.year = +d.year;
         d.gdp = +d.gdp;
-        d.primary_energy_consumption = +d.primary_energy_consumption;
+        // d.primary_energy_consumption = +d.primary_energy_consumption;
     });
 
     // Get unique country names
@@ -72,61 +72,71 @@ d3.json("data/world_clean_dataset.json").then(function (data) {
         .append("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-    // Create x and y scales (initial scales for all data)
-    const xScale = d3.scaleBand()
-        .domain(data.map(d => d.year))
-        .range([0, width])
-        .padding(0.1)
-        .paddingOuter(0.2);  // Add padding to the outer edges
-
-    const yScaleGDP = d3.scaleLinear()
-        .domain([0, d3.max(data, d => d.gdp)])
-        .range([height, 0]);
-
-    const yScaleEnergy = d3.scaleLinear()
-        .domain([0, d3.max(data, d => d.primary_energy_consumption)])
-        .range([height, 0]);
-
-    // Create x and y axes
-    const xAxis = d3.axisBottom(xScale);
-    const yAxisGDP = d3.axisLeft(yScaleGDP);
-    const yAxisEnergy = d3.axisRight(yScaleEnergy);
-
-    // Draw x axis
-    svg.append("g")
-        .attr("transform", "translate(0," + height + ")")
-        .call(xAxis)
-        .attr("class", "axis-bottom"); // Add a class for styling
-
-    /// Draw y axis for GDP (left)
-    svg.append("g")
-        .call(yAxisGDP)
-        .attr("class", "axis-left")
-        .selectAll(".tick text")
-        .style("text-anchor", "end")
-        .attr("dy", -1) // Adjust the vertical position of tick labels
-        .attr("dx", -4); // Adjust the horizontal position of tick labels
-
-
-    // Draw y axis for primary_energy_consumption (right)
-    svg.append("g")
-        .attr("transform", "translate(" + width + ", 0)")
-        .call(yAxisEnergy)
-        .attr("class", "axis-right"); // Add a class for styling
 
     // Function to update the chart based on the selected country
     function updateChart(selectedCountry, selectedType) {
+        // Remove existing chart elements including x-axis and y-axis
+        svg.selectAll(".bar-gdp, .line-energy, .dot, .axis-bottom, .axis-left, .axis-right").remove();
+
         console.log("Updating chart for:", selectedCountry, "with consumption type:", selectedType);
 
         const filteredData = data.filter(d => d.country === selectedCountry);
 
         console.log("Filtered Data:", filteredData);
 
+        // Create x and y scales (initial scales for all data)
+        const xScale = d3.scaleBand()
+            .domain(data.map(d => d.year))
+            .range([0, width])
+            .padding(0.1)
+            .paddingOuter(0.2);  // Add padding to the outer edges
+
+        const yScaleGDP = d3.scaleLinear()
+            .domain([0, d3.max(data, d => d.gdp)])
+            .range([height, 0]);
+
+
+        // Create color scale for bars and line dynamically based on the selected consumption type
+        const colorScale = d3.scaleLinear()
+            .domain([0, d3.max(filteredData, d => +d[selectedType])])
+            .range(['lightblue', 'steelblue']); // Adjust colors as needed
+
+        const yScaleEnergy = d3.scaleLinear()
+            .domain([0, d3.max(data, d => +d[selectedType])])
+            .range([height, 0]);
+
+        // Create x and y axes
+        const xAxis = d3.axisBottom(xScale);
+        const yAxisGDP = d3.axisLeft(yScaleGDP);
+        const yAxisEnergy = d3.axisRight(yScaleEnergy);
+
+        // Draw x axis
+        svg.append("g")
+            .attr("transform", "translate(0," + height + ")")
+            .call(xAxis)
+            .attr("class", "axis-bottom"); // Add a class for styling
+
+        /// Draw y axis for GDP (left)
+        svg.append("g")
+            .call(yAxisGDP)
+            .attr("class", "axis-left")
+            .selectAll(".tick text")
+            .style("text-anchor", "end")
+            .attr("dy", -1) // Adjust the vertical position of tick labels
+            .attr("dx", -4); // Adjust the horizontal position of tick labels
+
+
+        // Draw y axis for energy consumption (right)
+        svg.append("g")
+            .attr("transform", "translate(" + width + ", 0)")
+            .call(yAxisEnergy)
+            .attr("class", "axis-right"); // Add a class for styling
+
         // Update x and y scales for the filtered data
         xScale.domain(filteredData.map(d => d.year));
         yScaleGDP.domain([0, d3.max(filteredData, d => d.gdp)]);
-        // yScaleEnergy.domain([0, d3.max(filteredData, d => d.primary_energy_consumption)]);
         yScaleEnergy.domain([0, d3.max(filteredData, d => +d[selectedType])]);
+
 
         console.log("X Scale Domain:", xScale.domain());
         console.log("Y Scale GDP Domain:", yScaleGDP.domain());
@@ -148,11 +158,6 @@ d3.json("data/world_clean_dataset.json").then(function (data) {
             .duration(500)
             .call(yAxisEnergy);
 
-        // Remove existing chart elements
-        svg.selectAll(".bar-gdp").remove();
-        svg.selectAll(".line-energy").remove();
-        svg.selectAll(".dot").remove();
-
         // Draw bars for GDP with color grading and tooltip
         const bars = svg.selectAll(".bar-gdp")
             .data(filteredData)
@@ -162,9 +167,12 @@ d3.json("data/world_clean_dataset.json").then(function (data) {
             .attr("y", height) // Start the bars at the bottom of the chart
             .attr("width", xScale.bandwidth())
             .attr("height", 0) // Set initial height to 0
-            .style("fill", d => colorScale(d.primary_energy_consumption))
+            // .style("fill", d => colorScale(d[selectedType]))
             .on("mouseover", function (event, d) {
                 const tooltipData = filteredData[d];
+
+                // Format GDP with units (e.g., in trillions)
+                const formattedGDP = (+tooltipData.gdp / 1e12).toLocaleString() + "T";
 
                 // Increase size on mouseover
                 d3.select(this)
@@ -181,8 +189,8 @@ d3.json("data/world_clean_dataset.json").then(function (data) {
                     .duration(200)
                     .style("opacity", .9);
                 tooltip.html(
-                    "GDP: $ " + (+tooltipData.gdp).toLocaleString() +
-                    "<br>Energy Consumption: " + (+tooltipData.primary_energy_consumption).toLocaleString() + " terawatt-hours" +
+                    "GDP: $ " + formattedGDP +
+                    "<br>Energy Consumption: " + (+tooltipData[selectedType]).toLocaleString() + " terawatt-hours" +
                     "<br>Year: " + tooltipData.year
                 )
                     .style("left", (event.pageX + 10) + "px") // Adjust position relative to cursor
@@ -203,7 +211,7 @@ d3.json("data/world_clean_dataset.json").then(function (data) {
                     .attr("y", d => yScaleGDP(d.gdp));
 
                 // Change color back on mouseout
-                d3.select(this).style("fill", d => colorScale(d.primary_energy_consumption));
+                d3.select(this).style("fill", d => colorScale('steelblue'));
 
                 // Hide tooltip on mouseout
                 tooltip.transition()
@@ -215,7 +223,7 @@ d3.json("data/world_clean_dataset.json").then(function (data) {
             .attr("y", d => yScaleGDP(d.gdp))
             .attr("height", d => height - yScaleGDP(d.gdp));
 
-        // Draw line for primary_energy_consumption with color grading
+        // Draw line for energy consumption with color grading
         const line = d3.line()
             .x(d => xScale(d.year) + xScale.bandwidth() / 2)
             .y(d => yScaleEnergy(+d[selectedType]));
@@ -239,6 +247,10 @@ d3.json("data/world_clean_dataset.json").then(function (data) {
             .on("mouseover", function (event, d) {
                 const tooltipData = filteredData[d];
 
+                // Format GDP with units (e.g., in trillions)
+                const formattedGDP = (+tooltipData.gdp / 1e12).toLocaleString() + "T";
+
+
                 // Change color on mouseover
                 d3.select(this).style("fill", "blue");
 
@@ -253,8 +265,8 @@ d3.json("data/world_clean_dataset.json").then(function (data) {
                     .duration(200)
                     .style("opacity", .9);
                 tooltip.html(
-                    "GDP: $ " + (+tooltipData.gdp).toLocaleString() +
-                    "<br>Energy Consumption: " + (+tooltipData.primary_energy_consumption).toLocaleString() + " terawatt-hours" +
+                    "GDP: $ " + formattedGDP +
+                    "<br>Energy Consumption: " + (+tooltipData[selectedType]).toLocaleString() + " terawatt-hours" +
                     "<br>Year: " + tooltipData.year
                 )
                     .style("left", (event.pageX + 10) + "px") // Adjust position relative to cursor
@@ -334,12 +346,12 @@ d3.json("data/world_clean_dataset.json").then(function (data) {
         .style("font-size", "14px")
         .text("GDP");
 
-    // Add y axis label for primary_energy_consumption (right)
+    // Add y axis label for energy consumption (right)
     svg.append("text")
         .attr("transform", "rotate(-90)")
         .attr("x", -height / 2)
         .attr("y", width + 50)
         .attr("text-anchor", "middle")
         .style("font-size", "14px")
-        .text("Primary Energy Consumption (in terawatt-hours)");
+        .text("Energy Consumption (in terawatt-hours)");
 });
