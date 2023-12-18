@@ -102,7 +102,7 @@ To explore and run the "World Energy Consumption Visualized" project locally, fo
         http-server
         ```
 
-    - Visit **`[http://localhost:8000](http://localhost:8000)`** (or another specified port) in your web browser.
+    - Visit **`http://localhost:8000`** (or another specified port) in your web browser.
 
 By following these steps, you should be able to locally access and interact with the visualizations provided in the "World Energy Consumption Visualized" project. If you encounter any issues or have specific requirements, refer to the project's documentation or seek assistance in the respective community forums.
 
