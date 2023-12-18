@@ -15,7 +15,7 @@ const svg = d3.select("body")
 const parseDate = d3.timeParse("%Y");
 
 // Load data from CSV file
-d3.csv("world_clean_dataset.csv").then(data => {
+d3.csv("data/world_clean_dataset.csv").then(data => {
     // Extract unique countries
     const countries = [...new Set(data.map(d => d.country))];
 
@@ -32,7 +32,7 @@ d3.csv("world_clean_dataset.csv").then(data => {
     updateChart(selectedCountry);
 
     // Update chart when a new country is selected
-    d3.select("#countrySelect").on("change", function() {
+    d3.select("#countrySelect").on("change", function () {
         const selectedCountry = this.value;
         updateChart(selectedCountry);
     });
